@@ -30,6 +30,7 @@ public class WorkWithFile {
             throw new RuntimeException("Can't read data from the file " + fileName, e);
         }
     }
+
     /**
      * Process CSV lines and return array {supplySum, buySum}
      */
