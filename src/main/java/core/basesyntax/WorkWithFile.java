@@ -1,12 +1,21 @@
 package core.basesyntax;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * Reads a CSV file with market operations and writes a summary report.
+ *
+ * <p>Behavior:
+ * - Input CSV lines have format "operation,amount" where operation is "supply" or "buy".
+ * - For IO errors the method throws RuntimeException wrapping the original exception.
+ * - For malformed records (wrong fields or non-numeric amount) the method throws
+ *   RuntimeException describing the invalid record.
+ * - If the input file is empty, the output report will contain zeros.
+ */
 public class WorkWithFile {
     private static final String SUPPLY = "supply";
     private static final String BUY = "buy";
@@ -22,18 +31,14 @@ public class WorkWithFile {
     }
 
     private List<String> readLines(String fileName) {
-
         Path path = Path.of(fileName);
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
-            return reader.lines().toList();
+        try {
+            return Files.readAllLines(path);
         } catch (IOException e) {
-            throw new RuntimeException("Can't read data from the file " + fileName, e);
+            throw new RuntimeException("Can't read data from file: " + fileName, e);
         }
     }
 
-    /**
-     * Process CSV lines and return array {supplySum, buySum}
-     */
     private long[] processLines(List<String> lines) {
         long supplySum = 0L;
         long buySum = 0L;
@@ -57,11 +62,11 @@ public class WorkWithFile {
             String operation = parts[0].trim();
             String amountStr = parts[1].trim();
 
-            int amount;
+            long amount;
             try {
-                amount = Integer.parseInt(amountStr);
+                amount = Long.parseLong(amountStr);
             } catch (NumberFormatException e) {
-                throw new RuntimeException("Invalid number in record: \"" + rawLine + "\"");
+                throw new RuntimeException("Invalid number in record: \"" + rawLine + "\"", e);
             }
 
             if (SUPPLY.equals(operation)) {
@@ -87,8 +92,7 @@ public class WorkWithFile {
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
             writer.write(content);
         } catch (IOException e) {
-            throw new RuntimeException("Can't write data to the file " + fileName, e);
+            throw new RuntimeException("Can't write data to file: " + fileName, e);
         }
     }
-
 }
