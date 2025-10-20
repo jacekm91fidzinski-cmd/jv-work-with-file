@@ -22,6 +22,7 @@ public class WorkWithFile {
     }
 
     private List<String> readLines(String fileName) {
+
         Path path = Path.of(fileName);
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             return reader.lines().toList();
@@ -48,7 +49,8 @@ public class WorkWithFile {
 
             String[] parts = line.split(DELIMITER);
             if (parts.length != EXPECTED_PARTS) {
-                throw new RuntimeException("Invalid record (wrong number of fields): \"" + rawLine + "\"");
+                throw new RuntimeException(
+                        "Invalid record (wrong number of fields): \"" + rawLine + "\"");
             }
 
             String operation = parts[0].trim();
@@ -74,11 +76,9 @@ public class WorkWithFile {
 
     private String buildReport(long supplySum, long buySum) {
         long result = supplySum - buySum;
-        StringBuilder sb = new StringBuilder();
-        sb.append(SUPPLY).append(DELIMITER).append(supplySum).append(System.lineSeparator());
-        sb.append(BUY).append(DELIMITER).append(buySum).append(System.lineSeparator());
-        sb.append(RESULT).append(DELIMITER).append(result).append(System.lineSeparator());
-        return sb.toString();
+        return SUPPLY + DELIMITER + supplySum + System.lineSeparator()
+                + BUY + DELIMITER + buySum + System.lineSeparator()
+                + RESULT + DELIMITER + result + System.lineSeparator();
     }
 
     private void writeReport(String fileName, String content) {
